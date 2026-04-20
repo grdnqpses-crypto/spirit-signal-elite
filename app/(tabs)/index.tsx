@@ -1,45 +1,120 @@
-import { ScrollView, Text, View, TouchableOpacity } from "react-native";
+import { ScrollView, Text, View, Pressable, ActivityIndicator } from "react-native";
+import { useRouter } from "expo-router";
 
 import { ScreenContainer } from "@/components/screen-container";
+import { useAudio } from "@/lib/audio-context";
+import { useBilling } from "@/lib/billing-context";
+import { useColors } from "@/hooks/use-colors";
 
-/**
- * Home Screen - NativeWind Example
- *
- * This template uses NativeWind (Tailwind CSS for React Native).
- * You can use familiar Tailwind classes directly in className props.
- *
- * Key patterns:
- * - Use `className` instead of `style` for most styling
- * - Theme colors: use tokens directly (bg-background, text-foreground, bg-primary, etc.); no dark: prefix needed
- * - Responsive: standard Tailwind breakpoints work on web
- * - Custom colors defined in tailwind.config.js
- */
 export default function HomeScreen() {
+  const router = useRouter();
+  const colors = useColors();
+  const { isRecording, currentAnomaly, startRecording, stopRecording, isInitialized } = useAudio();
+  const { isElite, isInitialized: billingInitialized } = useBilling();
+
+  const handleScan = async () => {
+    if (!isElite && !isRecording) {
+      // Show paywall if not elite
+      router.push("../paywall");
+      return;
+    }
+
+    if (isRecording) {
+      await stopRecording();
+    } else {
+      await startRecording();
+    }
+  };
+
+  const getAnomalyColor = () => {
+    switch (currentAnomaly) {
+      case "Strong":
+        return colors.error;
+      case "Moderate":
+        return colors.warning;
+      case "Minor":
+        return colors.success;
+      default:
+        return colors.muted;
+    }
+  };
+
   return (
     <ScreenContainer className="p-6">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View className="flex-1 gap-8">
-          {/* Hero Section */}
-          <View className="items-center gap-2">
-            <Text className="text-4xl font-bold text-foreground">Welcome</Text>
-            <Text className="text-base text-muted text-center">
-              Edit app/(tabs)/index.tsx to get started
+        <View className="flex-1 justify-between">
+          {/* Header */}
+          <View className="gap-2">
+            <Text className="text-3xl font-bold text-foreground">Spirit Signal</Text>
+            <Text className="text-sm text-muted">
+              {isElite ? "Elite Mode" : "Free Mode"}
             </Text>
           </View>
 
-          {/* Example Card */}
-          <View className="w-full max-w-sm self-center bg-surface rounded-2xl p-6 shadow-sm border border-border">
-            <Text className="text-lg font-semibold text-foreground mb-2">NativeWind Ready</Text>
-            <Text className="text-sm text-muted leading-relaxed">
-              Use Tailwind CSS classes directly in your React Native components.
-            </Text>
+          {/* Status Display */}
+          <View className="items-center gap-6 my-12">
+            <View
+              className="w-32 h-32 rounded-full items-center justify-center border-4"
+              style={{
+                borderColor: getAnomalyColor(),
+                backgroundColor: colors.surface,
+              }}
+            >
+              <Text className="text-4xl font-bold text-foreground text-center">
+                {isRecording ? "SCANNING" : currentAnomaly || "READY"}
+              </Text>
+            </View>
+
+            {currentAnomaly && (
+              <View className="bg-surface p-4 rounded-lg border border-border">
+                <Text className="text-sm text-muted">Anomaly Detected</Text>
+                <Text
+                  className="text-2xl font-bold"
+                  style={{ color: getAnomalyColor() }}
+                >
+                  {currentAnomaly} Anomaly
+                </Text>
+              </View>
+            )}
           </View>
 
-          {/* Example Button */}
-          <View className="items-center">
-            <TouchableOpacity className="bg-primary px-6 py-3 rounded-full active:opacity-80">
-              <Text className="text-background font-semibold">Get Started</Text>
-            </TouchableOpacity>
+          {/* Controls */}
+          <View className="gap-3">
+            <Pressable
+              onPress={handleScan}
+              disabled={!isInitialized || !billingInitialized}
+              style={({ pressed }) => [
+                {
+                  backgroundColor: colors.primary,
+                  opacity: pressed ? 0.9 : 1,
+                },
+              ]}
+              className="py-4 px-6 rounded-xl items-center justify-center"
+            >
+              {!isInitialized || !billingInitialized ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text className="text-white font-bold text-lg">
+                  {isRecording ? "STOP" : "SCAN"}
+                </Text>
+              )}
+            </Pressable>
+
+            {!isElite && (
+              <Pressable
+                onPress={() => router.push("../paywall")}
+                className="py-3 px-6 rounded-xl items-center justify-center border border-primary"
+              >
+                <Text className="text-primary font-semibold">Unlock Elite - $9.99</Text>
+              </Pressable>
+            )}
+
+            <Pressable
+              onPress={() => router.push("../settings")}
+              className="py-3 px-6 rounded-xl items-center justify-center"
+            >
+              <Text className="text-muted font-semibold">Settings</Text>
+            </Pressable>
           </View>
         </View>
       </ScrollView>

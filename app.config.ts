@@ -32,7 +32,7 @@ const env = {
   appSlug: "sss-elite-app",
   // S3 URL of the app logo - set this to the URL returned by generate_image when creating custom logo
   // Leave empty to use the default icon from assets/images/icon.png
-  logoUrl: "",
+  logoUrl: "https://d2xsxph8kpxj0f.cloudfront.net/310419663029714460/3NL8i5YmCDnZByFipuf2HQ/icon-QARsoVGcZYpsmzaddZERjp.webp",
   scheme: schemeFromBundleId,
   iosBundleId: bundleId,
   androidPackage: bundleId,
@@ -56,7 +56,7 @@ const config: ExpoConfig = {
   },
   android: {
     adaptiveIcon: {
-      backgroundColor: "#E6F4FE",
+      backgroundColor: "#0a7ea4",
       foregroundImage: "./assets/images/android-icon-foreground.png",
       backgroundImage: "./assets/images/android-icon-background.png",
       monochromeImage: "./assets/images/android-icon-monochrome.png",
@@ -64,7 +64,7 @@ const config: ExpoConfig = {
     edgeToEdgeEnabled: true,
     predictiveBackGestureEnabled: false,
     package: env.androidPackage,
-    permissions: ["POST_NOTIFICATIONS"],
+    permissions: ["POST_NOTIFICATIONS", "RECORD_AUDIO", "INTERNET"],
     intentFilters: [
       {
         action: "VIEW",
