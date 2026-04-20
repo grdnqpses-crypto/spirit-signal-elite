@@ -1,4 +1,5 @@
 {
+  "projectId": "spirit-signal-elite",
   "cli": {
     "version": ">= 5.0.0"
   },
