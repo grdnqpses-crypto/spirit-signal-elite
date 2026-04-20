@@ -14,7 +14,7 @@ interface BillingContextType {
 
 const BillingContext = createContext<BillingContextType | undefined>(undefined);
 
-const ELITE_PRODUCT_ID = "spirit_signal_elite_unlock";
+const ELITE_PRODUCT_ID = "spirit_signal_elite_unlock"; // $9.99
 const ELITE_PURCHASE_KEY = "elite_purchase_status";
 
 export function BillingProvider({ children }: { children: React.ReactNode }) {
@@ -22,7 +22,7 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
-  const { getItem, setItem } = useAsyncStorage(ELITE_PURCHASE_KEY);
+  const { getItem: getEliteItem, setItem: setEliteItem } = useAsyncStorage(ELITE_PURCHASE_KEY);
 
   // Initialize IAP and check for existing purchases
   useEffect(() => {
@@ -40,24 +40,23 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
 
           if (hasElitePurchase) {
             setIsElite(true);
-            await setItem("true");
+            await setEliteItem("true");
           } else {
-            // Check local storage as fallback
-            const storedStatus = await getItem();
+            const storedStatus = await getEliteItem();
             setIsElite(storedStatus === "true");
           }
         } else {
           // For iOS and web, check local storage
-          const storedStatus = await getItem();
-          setIsElite(storedStatus === "true");
+          const eliteStatus = await getEliteItem();
+          setIsElite(eliteStatus === "true");
         }
 
         setIsInitialized(true);
       } catch (error) {
         console.error("Failed to initialize billing:", error);
         // Fallback to local storage
-        const storedStatus = await getItem();
-        setIsElite(storedStatus === "true");
+        const eliteStatus = await getEliteItem();
+        setIsElite(eliteStatus === "true");
         setIsInitialized(true);
       }
     };
@@ -80,7 +79,7 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
         // Simulate purchase flow
         await new Promise((resolve) => setTimeout(resolve, 1500));
         setIsElite(true);
-        await setItem("true");
+        await setEliteItem("true");
         setPurchaseError(null);
       } catch (error) {
         setPurchaseError("Purchase failed. Please try again.");
@@ -99,10 +98,10 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
         sku: ELITE_PRODUCT_ID,
       } as any);
 
-      // If successful, mark as elite
+      // If successful, mark as purchased
       if (result) {
         setIsElite(true);
-        await setItem("true");
+        await setEliteItem("true");
       }
     } catch (error: any) {
       if (error.code !== "E_USER_CANCELLED") {
@@ -128,7 +127,7 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
 
       if (hasElitePurchase) {
         setIsElite(true);
-        await setItem("true");
+        await setEliteItem("true");
       }
     } catch (error) {
       console.error("Failed to restore purchases:", error);

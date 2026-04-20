@@ -1,5 +1,4 @@
 {
-  "projectId": "spirit-signal-elite",
   "cli": {
     "version": ">= 5.0.0"
   },
@@ -15,15 +14,7 @@
     },
     "production": {
       "android": {
-        "buildType": "aab"
-      }
-    }
-  },
-  "submit": {
-    "production": {
-      "android": {
-        "serviceAccount": "YOUR_SERVICE_ACCOUNT_JSON_PATH",
-        "track": "internal"
+        "buildType": "app-bundle"
       }
     }
   }

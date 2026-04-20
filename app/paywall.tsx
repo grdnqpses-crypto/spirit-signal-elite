@@ -9,6 +9,10 @@ export default function PaywallScreen() {
   const colors = useColors();
   const { isElite, isPurchasing, purchaseError, initiatePurchase, restorePurchases } = useBilling();
 
+  const handlePurchase = () => {
+    initiatePurchase();
+  };
+
   if (isElite) {
     // User already has elite access, redirect to home
     router.replace("/");
@@ -69,7 +73,7 @@ export default function PaywallScreen() {
             )}
 
             <Pressable
-              onPress={initiatePurchase}
+              onPress={handlePurchase}
               disabled={isPurchasing}
               style={({ pressed }) => [
                 {
