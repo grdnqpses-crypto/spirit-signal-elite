@@ -2,29 +2,9 @@
 import "./scripts/load-env.js";
 import type { ExpoConfig } from "expo/config";
 
-// Bundle ID format: space.manus.<project_name_dots>.<timestamp>
-// e.g., "my-app" created at 2024-01-15 10:30:45 -> "space.manus.my.app.t20240115103045"
-// Bundle ID can only contain letters, numbers, and dots
-// Android requires each dot-separated segment to start with a letter
-const rawBundleId = "space.manus.sss.elite.app.t20260419204735";
-const bundleId =
-  rawBundleId
-    .replace(/[-_]/g, ".") // Replace hyphens/underscores with dots
-    .replace(/[^a-zA-Z0-9.]/g, "") // Remove invalid chars
-    .replace(/\.+/g, ".") // Collapse consecutive dots
-    .replace(/^\.+|\.+$/g, "") // Trim leading/trailing dots
-    .toLowerCase()
-    .split(".")
-    .map((segment) => {
-      // Android requires each segment to start with a letter
-      // Prefix with 'x' if segment starts with a digit
-      return /^[a-zA-Z]/.test(segment) ? segment : "x" + segment;
-    })
-    .join(".") || "space.manus.app";
-// Extract timestamp from bundle ID and prefix with "manus" for deep link scheme
-// e.g., "space.manus.my.app.t20240115103045" -> "manus20240115103045"
-const timestamp = bundleId.split(".").pop()?.replace(/^t/, "") ?? "";
-const schemeFromBundleId = `manus${timestamp}`;
+// Google Play requires exact package name: space.manus.sss.elite.app
+const bundleId = "space.manus.sss.elite.app";
+const schemeFromBundleId = "manussss";
 
 const env = {
   // App branding - update these values directly (do not use env vars)
@@ -40,7 +20,7 @@ const env = {
 
 const config: ExpoConfig = {
   name: env.appName,
-  slug: env.appSlug,
+  slug: "spirit-signal-elite",
   version: "1.0.0",
   runtimeVersion: "1.0.0",
   orientation: "portrait",
@@ -128,7 +108,7 @@ const config: ExpoConfig = {
   },
   extra: {
     eas: {
-      projectId: "42b42334-85d1-46d3-817e-8f58a69f7cc",
+      projectId: "75f9bad6-7c68-49d8-bd72-f68bbfe86b9c",
     },
   },
 };
